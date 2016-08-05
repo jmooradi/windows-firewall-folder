@@ -15,19 +15,21 @@
     Allow rule (default)
 .PARAMETER block
     Block rule 
-.PARAMETER a
+.PARAMETER recursive
+    If file search is recursive
+.PARAMETER run
     If not set script is run in test mode
 .EXAMPLE
     C:\PS> firewall-folder.ps1 -path "C:\Program Files\Program" -in -block
     <Block all inbound connects (test mode)>
 
-    C:\PS> firewall-folder.ps1 -path "C:\Program Files\Program" -in -block -a
+    C:\PS> firewall-folder.ps1 -path "C:\Program Files\Program" -in -block -run
     <Block all inbound connects>
 .NOTES
     Author: Jason Mooradian
     Date:   August 04, 2016    
 #>
-param([string]$path, [string]$group, [switch]$inbound, [switch]$outbound, [switch]$block, [switch]$allow, [switch]$a)
+param([string]$path, [string]$group, [switch]$inbound, [switch]$outbound, [switch]$block, [switch]$allow, [switch]$recursive, [switch]$run)
 
 $NET_FW_RULE_DIR_IN = "1"
 $NET_FW_RULE_DIR_OUT = "2"
@@ -75,22 +77,29 @@ function Add-FirewallDirectoryRules {
         $group = (Get-Item -Path $folder).Name
     }
 
-    if ($a -ne $true) {
-        Write-Host Test Mode: Run with -a
+    if ($run -ne $true) {
+        Write-Host Test Mode: Use -run to disable test mode
     }
 
         
     Write-Host Add Rules: (&{If($action -eq 1) {"Allow"} Else {"Block"}}) (&{If($direction -eq "1") {"Inbound"} Else {"Outbound"}}) Group=$group
-    Get-ChildItem -Path $folder -Filter *.exe -Recurse | ForEach {
+
+    if ($recursive -eq $true) {
+        $files = Get-ChildItem -Path $folder -Filter *.exe -Recurse 
+    } else {
+        $files = Get-ChildItem -Path $folder -Filter *.exe
+    }
+
+    $files | ForEach {
         $name = $_.Name
         $path = $_.Fullname
         Write-Host Add Rule: Name=`"$name`" Path=`"$path`" 
-        if ($a -eq $true) {
+        if ($run -eq $true) {
             Add-FirewallRule $_.Name $group $_.Fullname $direction $action
         }
     }
 
-    if ($a -eq $true) {
+    if ($run -eq $true) {
         Write-Host All Rules Added
     }
 }
@@ -123,7 +132,7 @@ If ($inbound -eq $true){$direction = $NET_FW_RULE_DIR_IN}
 If ($block -eq $true) {$action = $NET_FW_ACTION_BLOCK}
 If ($allow -eq $true) {$action = $NET_FW_ACTION_ALLOW}
 
-if ($a -eq $true -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if ($run -eq $true -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     
     $arguments = GetPSCall $PSBoundParameters
 
