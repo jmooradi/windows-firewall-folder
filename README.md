@@ -1,5 +1,5 @@
-# windows-firewall-folder
-Powershell script to automatically add all exes in a folder to Windows firewall
+# Windows Firewall Folder
+Powershell script to automatically add rules for all exes in a folder to Windows firewall
 ```
 PS> get-help .\firewall-folder.ps1
 
