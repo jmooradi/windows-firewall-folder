@@ -79,7 +79,7 @@ PARAMETERS
 
     -------------------------- EXAMPLE 1 --------------------------
 
-    PS>.\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block
+    PS> .\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block
 
     <Block all inbound connects (test mode)>
 
