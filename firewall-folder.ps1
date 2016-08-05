@@ -20,10 +20,10 @@
 .PARAMETER run
     If not set script is run in test mode
 .EXAMPLE
-    C:\PS> .\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block
+    PS> .\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block
     <Block all inbound connects (test mode)>
 
-    C:\PS> .\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block -run
+    PS> .\firewall-folder.ps1 -path "C:\Program Files\Program" -in -block -run
     <Block all inbound connects>
 .NOTES
     Author: Jason Mooradian
